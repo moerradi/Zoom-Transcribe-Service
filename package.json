@@ -1,0 +1,26 @@
+{
+  "name": "anothermind_transcribe",
+  "version": "1.0.0",
+  "description": "A transcribing microservice for anothermind.io using AWS transcribe",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moerradi/anothermind_transcribe.git"
+  },
+  "author": "Mohammed Erradi",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/moerradi/anothermind_transcribe/issues"
+  },
+  "homepage": "https://github.com/moerradi/anothermind_transcribe#readme",
+  "dependencies": {
+    "@aws-sdk/client-transcribe-streaming": "^1.0.0-gamma.4",
+    "aws-sdk": "^2.995.0",
+    "dotenv": "^10.0.0",
+    "redis": "^3.1.2"
+  }
+}

@@ -1,0 +1,1 @@
+// will put configutations here and export them to transcribe js later
