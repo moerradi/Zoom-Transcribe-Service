@@ -20,19 +20,16 @@ MediaSampleRateHertz = 16000;
 // English is en-US
 if (!LANGUAGE_CODE) LANGUAGE_CODE = 'en-US';
 
-
 // importing sdk for client transcribe streamingm
 const {
   TranscribeStreamingClient,
   StartStreamTranscriptionCommand,
 } = require('@aws-sdk/client-transcribe-streaming');
 
-
 const StreamAudioToHttp2 = async function () {
-
-//   process.stdin._writableState.highWaterMark = 4096; // Read with chunk size of 3200 as the audio is 16kHz linear PCM
-//   process.stdin.resume();
-//   process.std
+  // setting chuck size for the audio stream 4 mb is always the perfect chuck size for buffering
+  process.stdin._writableState.highWaterMark = 4096;
+  process.stdin.resume();
 
   const toTranscribe = async function* () {
     for await (const chunk of process.stdin) {
@@ -41,16 +38,27 @@ const StreamAudioToHttp2 = async function () {
     }
   };
 
+  // initiating the transcribie streaming client
   const transcribeClient = new TranscribeStreamingClient({
     region: AWS_REGION,
   });
 
+  // speaker identification can be i;pleneted using 2 approeaches 
+  // Approach 1 : the streaming team takes each zoom audio output and send it as a seperate channel and I can enable channel identificatoin and assing a labael to each channel
+  // this approach will work perfectly but is so resource demanding so I am not rooting for ir that much
+  // Approach 2 : I use aws transcribe built in speaker identification but it is not well implemented and still so buggy but i get the work done
+
+  // this is the transcibtion command, to add further costumization please read : 
+  // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-transcribe-streaming/classes/startstreamtranscriptioncommand.html
   const TranscriptionCommand = new StartStreamTranscriptionCommand({
     LanguageCode: LANGUAGE_CODE,
     VocabularyName: VOCABULARY_NAME,
     VocabularyFilterName: VOCABULARY_FILTER,
     VocabularyFilterMethod: VOCABULARY_FILTER_METHOD,
     MediaSampleRateHertz: MediaSampleRateHertz,
+	// EnableChannelIdentification: true, 
+	// NumberOfChannels: 2,
+	ShowSpeakerLabel: true, // still expirimenting with speakers label aws transcribe can distinguish up to 10 individual speakers
     MediaEncoding: 'pcm',
     AudioStream: toTranscribe(),
   });
@@ -59,8 +67,9 @@ const StreamAudioToHttp2 = async function () {
     TranscriptionCommand
   );
 
+  // outputing the status code of the http2 stream handshake 200 is success
   console.log(
-    `AWS Transcribe connection status code: ${TranscriptionCommandOutput.$metadata.httpStatusCode}`
+    `AWS Transcribe status code: ${TranscriptionCommandOutput.$metadata.httpStatusCode}`
   );
   for await (const transcriptionEvent of TranscriptionCommandOutput.TranscriptResultStream) {
     const transcript = transcriptionEvent.TranscriptEvent.Transcript;
@@ -69,15 +78,18 @@ const StreamAudioToHttp2 = async function () {
       if (results.length > 0) {
         if (results[0].Alternatives.length > 0) {
           let transcript = results[0].Alternatives[0].Transcript;
-          // if this transcript segment is final output it to console
-		  // fix encoding for accented characters
-		  transcript = decodeURIComponent(transcript);
-		  // outputing results of only complete sentences
-		//   console.clear();
+		  console.log();
+          // fix encoding for accented characters
+          transcript = decodeURIComponent(transcript);
+          // outputing results of only complete sentences
+          //   console.clear();
+		  // to send transcribtion results to front end and make front end syncronsie it with the video i will send the start time and end time of the transcript relative to stream start
+		  // that's why in the start.sh script i use ffprobe to get the duration of stream till the given moment of the script start
 		  console.log(transcript);
-		  // use this to check if the transcribtion output is partial or complete send it to AI only if complete
-        //   if (!results[0].IsPartial) {
-        //   }
+        //   console.log( `${JSON.stringify(results[0].ChannelId)} : ${transcript}`);
+          // use this to check if the transcribtion output is partial or complete send it to AI only if complete
+          //   if (!results[0].IsPartial) {
+          //   }
         }
       }
     }
