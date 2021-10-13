@@ -21,6 +21,7 @@
     "@aws-sdk/client-transcribe-streaming": "^1.0.0-gamma.4",
     "aws-sdk": "^2.995.0",
     "dotenv": "^10.0.0",
+    "express": "^4.17.1",
     "redis": "^3.1.2"
   }
 }

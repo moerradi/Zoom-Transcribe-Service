@@ -77,15 +77,30 @@ const StreamAudioToHttp2 = async function () {
       const results = transcript.Results;
       if (results.length > 0) {
         if (results[0].Alternatives.length > 0) {
-          let transcript = results[0].Alternatives[0].Transcript;
-		  console.log();
-          // fix encoding for accented characters
-          transcript = decodeURIComponent(transcript);
+        //   let transcript = results[0].Alternatives[0].Transcript;
+		  if (!results[0].IsPartial)
+		  	{
+				var speaker = results[0].Alternatives[0].Items[0].Speaker;
+				process.stdout.write("speaker " + speaker + " : ")
+				  results[0].Alternatives[0].Items.forEach((element) =>{
+					  if (element.Speaker === speaker || element.Speaker === undefined)
+					  process.stdout.write(element.Content + " ");
+					else
+						{
+							console.log("");
+							speaker = element.Speaker;
+							process.stdout.write("speaker " + speaker + " : ");
+							process.stdout.write(element.Content + " ");
+						}
+				  })
+				  console.log("");
+			  }        // fix encoding for accented characters
+        //   transcript = decodeURIComponent(transcript);
           // outputing results of only complete sentences
           //   console.clear();
 		  // to send transcribtion results to front end and make front end syncronsie it with the video i will send the start time and end time of the transcript relative to stream start
 		  // that's why in the start.sh script i use ffprobe to get the duration of stream till the given moment of the script start
-		  console.log(transcript);
+		//   console.log(transcript);
         //   console.log( `${JSON.stringify(results[0].ChannelId)} : ${transcript}`);
           // use this to check if the transcribtion output is partial or complete send it to AI only if complete
           //   if (!results[0].IsPartial) {
