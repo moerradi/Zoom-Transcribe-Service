@@ -1,4 +1,5 @@
 require('dotenv').config();
+const fs = require('fs');
 
 // use alternative region for the Amazon transcribe service
 const AWS_REGION = process.env.REGION;
@@ -81,19 +82,20 @@ const StreamAudioToHttp2 = async function () {
 		  if (!results[0].IsPartial)
 		  	{
 				var speaker = results[0].Alternatives[0].Items[0].Speaker;
-				process.stdout.write("speaker " + speaker + " : ")
+				var logStream = fs.createWriteStream('log.txt', {flags: 'a'});
+				logStream.write("speaker " + speaker + " : ")
 				  results[0].Alternatives[0].Items.forEach((element) =>{
 					  if (element.Speaker === speaker || element.Speaker === undefined)
-					  process.stdout.write(element.Content + " ");
+					  logStream.write(element.Content + " ");
 					else
 						{
-							console.log("");
+							logStream.write("\n");
 							speaker = element.Speaker;
-							process.stdout.write("speaker " + speaker + " : ");
-							process.stdout.write(element.Content + " ");
+							logStream.write("speaker " + speaker + " : ");
+							logStream.write(element.Content + " ");
 						}
 				  })
-				  console.log("");
+				  logStream.write("\n");
 			  }        // fix encoding for accented characters
         //   transcript = decodeURIComponent(transcript);
           // outputing results of only complete sentences

@@ -1,8 +1,8 @@
 #this script supports both HLS and ICECAST
 
 # sample stream for testing purposes
-STREAM_INPUT=rtmp://ec2-54-255-223-194.ap-southeast-1.compute.amazonaws.com/live/testmeeting
-
+STREAM_INPUT=rtmp://localhost/live/$1
+# STREAM_INPUT=https://3a8069d41be2.eu-west-1.playback.live-video.net/api/video/v1/eu-west-1.364536189588.channel.b6A6SrZfzXtA.m3u8
 # checking if stream input is defined
 if [ -z  ${STREAM_INPUT} ]
 then
