@@ -17,7 +17,7 @@ do
 	printf "feed_time value: ${feed_time}\n"
 	if [ ! -z ${feed_time} ]
 	then
-		ffmpeg -i $STREAM_INPUT -tune zerolatency -muxdelay 0 -af "afftdn=nf=-20, highpass=f=200, lowpass=f=3000" -vn -sn -dn -f wav -ar 16000 -ac 1 - 2>/dev/null | node transcribe.js $feed_time
+		ffmpeg -i $STREAM_INPUT -tune zerolatency -muxdelay 0 -af "afftdn=nf=-20, highpass=f=200, lowpass=f=3000" -vn -sn -dn -f wav -ar 16000 -ac 1 - 2>/dev/null | node transcribe.js $feed_time $1.log
 	fi
 	echo "Loop finish"
 

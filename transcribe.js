@@ -82,7 +82,7 @@ const StreamAudioToHttp2 = async function () {
 		  if (!results[0].IsPartial)
 		  	{
 				var speaker = results[0].Alternatives[0].Items[0].Speaker;
-				var logStream = fs.createWriteStream('log.txt', {flags: 'a'});
+				var logStream = fs.createWriteStream(process.argv[3], {flags: 'a'});
 				logStream.write("speaker " + speaker + " : ")
 				  results[0].Alternatives[0].Items.forEach((element) =>{
 					  if (element.Speaker === speaker || element.Speaker === undefined)
